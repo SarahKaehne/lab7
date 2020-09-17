@@ -3,7 +3,7 @@ const Actor = require('../models/actor');
 const Movie = require('../models/movie');
 module.exports = {
     getAll: function (req, res) {
-        Actor.find(function (err, actors) {
+        Actor.find({}).populate('movies').exec(function (err, actors) {
             if (err) {
                 return res.status(404).json(err);
             } else {
@@ -54,6 +54,23 @@ module.exports = {
                     res.json(actor);
                 });
             })
+        });
+    },
+
+    delActorMovies: function (req, res) {
+        Actor.findOneAndRemove({ _id: req.params.id }, function (err) {
+            if (err) return res.status(400).json(err);
+        });
+        Movie.deleteMany({ actors: req.params.id }, function (err, doc) {
+            if (err) return res.status(400).json(err);
+            res.json();
+        });
+    },
+    delMovieActor:function (req, res) {
+        Actor.findOneAndUpdate({ _id: req.params.aid }, { $unset: { movies: req.params.mid } }, function (err, actor) {
+            if (err) return res.status(400).json(err);
+            if (!actor) return res.status(404).json();
+            res.json();
         });
     }
 };

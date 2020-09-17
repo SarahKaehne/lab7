@@ -3,7 +3,7 @@ var Movie = require('../models/movie');
 const mongoose = require('mongoose');
 module.exports = {
     getAll: function (req, res) {
-        Movie.find(function (err, movies) {
+        Movie.find({}).populate('actors').exec(function (err, movies) {
             if (err) return res.status(400).json(err);
             res.json(movies);
         });
@@ -30,6 +30,62 @@ module.exports = {
             if (err) return res.status(400).json(err);
             if (!movie) return res.status(404).json();
             res.json(movie);
+        });
+    },
+
+    deleteOne: function (req, res) {
+        Movie.findOneAndRemove({ _id: req.params.id }, function (err) {
+            if (err) return res.status(400).json(err);
+            res.json();
+        });
+    },
+    delActorMovie:function (req, res) {
+        Movie.findOneAndUpdate({ _id: req.params.mid }, { $unset: { actors: req.params.aid } }, function (err, movie) {
+            if (err) return res.status(400).json(err);
+            if (!movie) return res.status(404).json();
+            res.json(movie);
+        });
+    },
+    updateActors: function (req, res) {
+        Movie.findOne({ _id: req.params.mid }, function (err, movie) {
+            if (err) return res.status(400).json(err);
+            if (!movie) return res.status(404).json();
+            Actor.findOne({ _id: req.params.aid }, function (err, movie) {
+                if (err) return res.status(400).json(err);
+                if (!actor) return res.status(404).json();
+                movie.actor.push(actor._id);
+                movie.save(function (err) {
+                    if (err) return res.status(500).json(err);
+                    res.json();
+                });
+            })
+        });
+    },
+    addActor: function (req, res) {
+        Movie.findOne({ _id: req.params.id }, function (err, movie) {
+            if (err) return res.status(400).json(err);
+            if (!movie) return res.status(404).json();
+            Actor.findOne({ _id: req.body.id }, function (err, actor) {
+                if (err) return res.status(400).json(err);
+                if (!actor) return res.status(404).json();
+                movie.actors.push(actor._id);
+                movie.save(function (err) {
+                    if (err) return res.status(500).json(err);
+                    res.json();
+                });
+            })
+        });
+    },
+    movieYear: function (req,res){
+        Movie.where('year').gte(req.params.year2).lte(req.params.year1).exec(function (err, movies) {
+            if (err) return res.status(400).json(err);
+            res.json(movies);
+        });
+    },
+    deleteBetween: function (req,res){
+        Movie.deleteMany({year: {$gte: req.body.year2, $lte: req.body.year1}}, function (err, movies) {
+            if (err) return res.status(400).json(err);
+            res.json(movies);
         });
     }
 };

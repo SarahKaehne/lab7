@@ -46,21 +46,6 @@ module.exports = {
             res.json(movie);
         });
     },
-    updateActors: function (req, res) {
-        Movie.findOne({ _id: req.params.mid }, function (err, movie) {
-            if (err) return res.status(400).json(err);
-            if (!movie) return res.status(404).json();
-            Actor.findOne({ _id: req.params.aid }, function (err, movie) {
-                if (err) return res.status(400).json(err);
-                if (!actor) return res.status(404).json();
-                movie.actor.push(actor._id);
-                movie.save(function (err) {
-                    if (err) return res.status(500).json(err);
-                    res.json();
-                });
-            })
-        });
-    },
     addActor: function (req, res) {
         Movie.findOne({ _id: req.params.id }, function (err, movie) {
             if (err) return res.status(400).json(err);

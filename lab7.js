@@ -45,3 +45,6 @@ app.post('/movies/:id/actors', movies.addActor);
 app.get('/movies/:year1/:year2', movies.movieYear);
 //9.Delete all the movies that are produced between two years.
 app.delete('/delmovies', movies.deleteBetween);
+
+//extra task
+app.get('/actors', actors.extraTask);

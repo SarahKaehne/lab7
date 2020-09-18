@@ -72,5 +72,19 @@ module.exports = {
             if (!actor) return res.status(404).json();
             res.json();
         });
+    },
+    extraTask:function (req, res) {
+        Actor.where(getage(bYear)).gte(req.query.min_age).lte(req.query.max_age).exec(function (err, actors) {
+            if (err) return res.status(400).json(err);
+            res.json(actors);
+        });
+    },
+
+
+    getage: function(year) {    
+        var actorYear = year;
+        var currYear = getFullYear();
+        var age = currYear - actorYear;
+        return(age)
     }
 };
